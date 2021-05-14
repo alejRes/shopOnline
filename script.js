@@ -28,6 +28,8 @@ https://fakestoreapi.com/products
 6 - Eliminar del DOM la lista anterior y generar los nuevos items con la información de cada elemento.
 7 - Modificar la función que muestra en el DOM las etiquetas <li> (punto 2), para que nuestra aplicación muestre la información completa de cada producto en una tarjeta como las que podemos encontrar en una tienda online. */
 
+let precios = [];
+
 let selector = document.createElement("select")
 document.querySelector("#select").appendChild(selector)
 
@@ -50,17 +52,27 @@ let selectCategories = (category)=>{
     category=="All"? endpoint ='https://fakestoreapi.com/products': endpoint = `https://fakestoreapi.com/products/category/${category}`
     fetch(endpoint)
     .then(res=>res.json())
-    .then(json=>json.map(producto=>addTarget(producto.image, producto.title, producto.price, producto.description)))
-}
+    .then(json=>json.map(producto=>{
+
+        precios.push(producto)
+        
+        addTarget(producto.image, producto.title, producto.price, producto.description)
+    })
+    
+    
+)}
 
 selectCategories("All")
 
 selector.addEventListener("change",()=>{
     document.getElementById("result").innerHTML=""
     selectCategories(selector.value) 
+    precios =[]
+    
 })
 
 let addTarget = (url, tit, pri, desc ) =>{
+    
     let seccion= document.createElement("section")
     let tarjeta = document.createElement("figure")
     let image = document.createElement("img")
@@ -81,3 +93,19 @@ let addTarget = (url, tit, pri, desc ) =>{
     piefoto.appendChild(precio)
     document.querySelector("#result").appendChild(tarjeta)
 }
+
+document.querySelector("button").addEventListener("click",(e)=>{
+    e.target.innerHTML == "Orden ascendente"? (
+        e.target.innerHTML = "Orden descendente",
+        precios.sort(function(a, b){return a.price-b.price}),
+        document.getElementById("result").innerHTML="",
+        precios.map(ele => addTarget(ele.image, ele.title, ele.price, ele.description))
+        
+        
+    ): (e.target.innerHTML="Orden ascendente",
+        document.getElementById("result").innerHTML="",
+        precios.sort(function(a, b){return b.price-a.price})),
+        precios.map(ele => addTarget(ele.image, ele.title, ele.price, ele.description))
+    console.log(precios)
+
+})
